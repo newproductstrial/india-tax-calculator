@@ -107,7 +107,7 @@
       <li>Rates for FY 2026-27 (AY 2027-28) under the Income-tax Act, 2025 / Finance Act, 2026. Slabs are unchanged from FY 2025-26.</li>
       <li>Assumes a resident individual below 60 years. Age groups 60+ are not supported; their old-regime slabs differ.</li>
       <li>New regime: standard deduction &#8377;75,000 on salary; section 87A rebate up to &#8377;60,000 when taxable income is &#8377;12,00,000 or less, with marginal relief just above that limit.</li>
-      <li>Old regime: standard deduction &#8377;50,000; section 87A rebate up to &#8377;12,500 when taxable income is &#8377;5,00,000 or less, with marginal relief; deductions you enter are applied in full.</li>
+      <li>Old regime: standard deduction &#8377;50,000; section 87A rebate up to &#8377;12,500 when taxable income is &#8377;5,00,000 or less. Above that, no rebate and no marginal relief applies (verified against the official Income Tax Department calculator, which computes full slab tax just above &#8377;5,00,000). Deductions you enter are applied in full.</li>
       <li>Surcharge: 10% above &#8377;50L, 15% above &#8377;1Cr, 25% above &#8377;2Cr (new regime cap); old regime 37% above &#8377;5Cr. Surcharge marginal relief is applied. Health and Education Cess 4% added.</li>
       <li>Excluded: capital gains and other special-rate income (sec 111A/112/112A), HRA and other exemptions, professional tax, family pension rules, clubbing and set-off of losses, and the alternate regime for business income opt-outs.</li>
       <li>This is an estimate, not tax advice. Verify on the Income Tax Department site before filing.</li>
@@ -147,8 +147,8 @@ function totalTax(ti, regime){
     rebate = Math.min(slab, maxRebate);
   }
   let tax = slab - rebate;
-  if (ti > limit){
-    // marginal relief on 87A rebate: tax capped at income above the rebate limit
+  if (isNew && ti > limit){
+    // marginal relief on 87A rebate (new regime only): tax capped at income above the rebate limit
     const cap = ti - limit;
     if (cap < tax) tax = cap;
   }
