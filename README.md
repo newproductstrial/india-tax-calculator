@@ -14,7 +14,8 @@ Live site: https://newproductstrial.github.io/india-tax-calculator/
   marginal relief.
 - Old regime slabs: 0-2.5L nil, 2.5-5L 5%, 5-10L 20%, above 10L 30%. Standard
   deduction Rs 50,000. Section 87A rebate up to Rs 12,500 at taxable income up
-  to Rs 5,00,000, with marginal relief. User-entered Chapter VI-A deductions
+  to Rs 5,00,000; no rebate or marginal relief above that (matches the
+  official Income Tax Department calculator). User-entered Chapter VI-A deductions
   (80C capped at Rs 1.5L).
 - Surcharge with marginal relief; Health and Education Cess 4%.
 
