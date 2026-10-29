@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>India Tax Calculator FY 2026-27 (AY 2027-28)</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#17202a; --muted:#5b6572;
+    --line:#e3e7ec; --accent:#0b6e4f; --accent-soft:#e6f4ee; --warn:#9a3b26;
+    --warn-soft:#fbeae5; --best:#0b6e4f;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.5; padding:16px;}
+  .wrap{max-width:760px; margin:0 auto;}
+  header{padding:8px 0 20px;}
+  h1{font-size:1.45rem; letter-spacing:-0.01em;}
+  .sub{color:var(--muted); font-size:0.9rem; margin-top:4px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:18px; margin-bottom:16px; box-shadow:0 1px 2px rgba(16,24,40,.04);}
+  .card h2{font-size:1.02rem; margin-bottom:12px;}
+  label{display:block; font-size:0.86rem; color:var(--muted); margin:10px 0 4px;}
+  input,select{width:100%; padding:11px 12px; font-size:1rem; border:1px solid var(--line);
+    border-radius:10px; background:#fff; color:var(--ink);}
+  input:focus,select:focus{outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent);}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:560px){.grid2{grid-template-columns:1fr;}}
+  .hint{font-size:0.78rem; color:var(--muted); margin-top:3px;}
+  button.calc{width:100%; margin-top:16px; padding:13px; font-size:1rem; font-weight:600;
+    color:#fff; background:var(--accent); border:0; border-radius:10px; cursor:pointer;}
+  button.calc:active{transform:translateY(1px);}
+  .verdict{border-radius:12px; padding:14px 16px; font-weight:600; margin-bottom:16px;
+    background:var(--accent-soft); color:var(--accent); border:1px solid #bfe3d4; font-size:0.95rem;}
+  .regime{border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px;}
+  .regime.best{border-color:var(--best); box-shadow:0 0 0 2px var(--accent-soft) inset;}
+  .regime h3{font-size:0.98rem; display:flex; justify-content:space-between; align-items:center;}
+  .tag{font-size:0.7rem; font-weight:700; color:#fff; background:var(--best);
+    padding:3px 8px; border-radius:999px; text-transform:uppercase; letter-spacing:.04em;}
+  table{width:100%; border-collapse:collapse; margin-top:10px; font-size:0.9rem;}
+  td{padding:6px 0; border-bottom:1px dashed var(--line);}
+  td:last-child{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  tr.total td{font-weight:700; border-bottom:0; border-top:2px solid var(--line); font-size:1rem;}
+  .zero{color:var(--accent); font-weight:700;}
+  .blocked{background:var(--warn-soft); border:1px solid #f2c9bd; color:var(--warn);
+    border-radius:12px; padding:14px 16px; font-size:0.92rem;}
+  .notes{font-size:0.8rem; color:var(--muted);}
+  .notes li{margin:6px 0 6px 18px;}
+  .notes a{color:var(--accent);}
+  footer{text-align:center; color:var(--muted); font-size:0.75rem; padding:10px 0 30px;}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>India Income Tax Calculator</h1>
+    <p class="sub">FY 2026-27 (AY 2027-28) &middot; New vs Old regime for a salaried resident individual</p>
+  </header>
+
+  <div class="card">
+    <h2>Your details</h2>
+    <label for="age">Age group</label>
+    <select id="age">
+      <option value="below60" selected>Below 60 years</option>
+      <option value="senior">60 to 79 years</option>
+      <option value="super">80 years or above</option>
+    </select>
+    <label for="salary">Gross annual salary income (&#8377;)</label>
+    <input id="salary" type="number" min="0" step="1000" inputmode="numeric" placeholder="e.g. 1300000" value="1300000">
+    <label for="other">Other income taxed at slab rates (&#8377;, optional)</label>
+    <input id="other" type="number" min="0" step="1000" inputmode="numeric" placeholder="e.g. interest, rent (net)">
+    <h2 style="margin-top:18px;">Old regime deductions (Chapter VI-A)</h2>
+    <div class="grid2">
+      <div>
+        <label for="d80c">Section 80C (&#8377;)</label>
+        <input id="d80c" type="number" min="0" step="1000" inputmode="numeric" placeholder="max 1,50,000">
+        <p class="hint">Capped at &#8377;1,50,000.</p>
+      </div>
+      <div>
+        <label for="d80d">Section 80D (&#8377;)</label>
+        <input id="d80d" type="number" min="0" step="1000" inputmode="numeric" placeholder="eligible premium">
+      </div>
+    </div>
+    <label for="dother">Other eligible old-regime deductions (&#8377;)</label>
+    <input id="dother" type="number" min="0" step="1000" inputmode="numeric" placeholder="e.g. 80CCD(1B), home loan interest">
+    <p class="hint">Enter only amounts you are eligible to claim. The calculator does not validate section-wise limits beyond 80C.</p>
+    <button class="calc" id="go">Calculate tax</button>
+  </div>
+
+  <div id="blocked" class="blocked hidden"></div>
+  <div id="results" class="hidden">
+    <div class="verdict" id="verdict"></div>
+    <div class="regime" id="cardNew">
+      <h3>New regime (default, sec 115BAC) <span class="tag hidden" id="tagNew">Lower tax</span></h3>
+      <table id="tblNew"></table>
+    </div>
+    <div class="regime" id="cardOld">
+      <h3>Old regime <span class="tag hidden" id="tagOld">Lower tax</span></h3>
+      <table id="tblOld"></table>
+    </div>
+  </div>
+
+  <div class="card notes">
+    <h2>Scope, assumptions and exclusions</h2>
+    <ul>
+      <li>Rates for FY 2026-27 (AY 2027-28) under the Income-tax Act, 2025 / Finance Act, 2026. Slabs are unchanged from FY 2025-26.</li>
+      <li>Assumes a resident individual below 60 years. Age groups 60+ are not supported; their old-regime slabs differ.</li>
+      <li>New regime: standard deduction &#8377;75,000 on salary; section 87A rebate up to &#8377;60,000 when taxable income is &#8377;12,00,000 or less, with marginal relief just above that limit.</li>
+      <li>Old regime: standard deduction &#8377;50,000; section 87A rebate up to &#8377;12,500 when taxable income is &#8377;5,00,000 or less, with marginal relief; deductions you enter are applied in full.</li>
+      <li>Surcharge: 10% above &#8377;50L, 15% above &#8377;1Cr, 25% above &#8377;2Cr (new regime cap); old regime 37% above &#8377;5Cr. Surcharge marginal relief is applied. Health and Education Cess 4% added.</li>
+      <li>Excluded: capital gains and other special-rate income (sec 111A/112/112A), HRA and other exemptions, professional tax, family pension rules, clubbing and set-off of losses, and the alternate regime for business income opt-outs.</li>
+      <li>This is an estimate, not tax advice. Verify on the Income Tax Department site before filing.</li>
+      <li>Sources: <a href="https://www.incometaxindia.gov.in/tax-rates">incometaxindia.gov.in tax rates</a>, <a href="https://www.indiabudget.gov.in/doc/memo.pdf">Finance Bill 2026 memorandum (indiabudget.gov.in)</a>.</li>
+    </ul>
+  </div>
+  <footer>Sample project hosted on GitHub Pages.</footer>
+</div>
+<script>
+const NEW_SLABS = [[400000,0],[800000,0.05],[1200000,0.10],[1600000,0.15],[2000000,0.20],[2400000,0.25],[Infinity,0.30]];
+const OLD_SLABS = [[250000,0],[500000,0.05],[1000000,0.20],[Infinity,0.30]];
+const L = 100000, CR = 10000000;
+
+function slabTax(ti, slabs){
+  let tax = 0, prev = 0;
+  for (const [cap, rate] of slabs){
+    if (ti > prev){
+      tax += (Math.min(ti, cap) - prev) * rate;
+      prev = cap;
+    } else break;
+  }
+  return tax;
+}
+// thresholds: [income, surcharge rate for income above it]
+const NEW_SUR = [[50*L,0.10],[100*L,0.15],[200*L,0.25]];
+const OLD_SUR = [[50*L,0.10],[100*L,0.15],[200*L,0.25],[500*L,0.37]];
+
+function totalTax(ti, regime){
+  if (ti <= 0) return {tax:0, slab:0, rebate:0, surcharge:0, cess:0};
+  const isNew = regime === 'new';
+  const slabs = isNew ? NEW_SLABS : OLD_SLABS;
+  let slab = slabTax(ti, slabs);
+  let rebate = 0;
+  const limit = isNew ? 1200000 : 500000;
+  const maxRebate = isNew ? 60000 : 12500;
+  if (ti <= limit){
+    rebate = Math.min(slab, maxRebate);
+  }
+  let tax = slab - rebate;
+  if (ti > limit){
+    // marginal relief on 87A rebate: tax capped at income above the rebate limit
+    const cap = ti - limit;
+    if (cap < tax) tax = cap;
+  }
+  // surcharge with marginal relief
+  const steps = isNew ? NEW_SUR : OLD_SUR;
+  let rate = 0;
+  for (const [th, r] of steps){ if (ti > th) rate = r; }
+  let surcharge = tax * rate;
+  let withSur = tax + surcharge;
+  // marginal relief vs each lower threshold
+  for (const [th, r] of steps){
+    if (ti > th){
+      const thTaxObj = totalTaxNoRelief(th, regime);
+      const allowed = thTaxObj + (ti - th);
+      if (withSur > allowed) withSur = allowed;
+    }
+  }
+  surcharge = withSur - tax;
+  const cess = 0.04 * withSur;
+  return {tax: withSur + cess, slab, rebate, surcharge, cess};
+}
+// tax + surcharge at an exact threshold income (no further relief needed there)
+function totalTaxNoRelief(ti, regime){
+  const isNew = regime === 'new';
+  const slabs = isNew ? NEW_SLABS : OLD_SLABS;
+  let t = slabTax(ti, slabs);
+  const steps = isNew ? NEW_SUR : OLD_SUR;
+  let rate = 0, prevRateApplies = 0;
+  for (const [th, r] of steps){ if (ti > th) rate = r; }
+  // at an exact threshold, the surcharge rate is the one for income NOT exceeding it
+  const idx = steps.findIndex(([th]) => th === ti);
+  if (idx >= 0) rate = idx === 0 ? 0 : steps[idx-1][1];
+  return t * (1 + rate);
+}
+const fmt = n => '\u20B9' + Math.round(n).toLocaleString('en-IN');
+const num = id => { const v = parseFloat(document.getElementById(id).value); return isNaN(v) || v < 0 ? 0 : v; };
+
+function rows(o){
+  let h = '';
+  h += '<tr><td>Taxable income</td><td>' + fmt(o.taxable) + '</td></tr>';
+  h += '<tr><td>Tax before rebate</td><td>' + fmt(o.slab) + '</td></tr>';
+  h += '<tr><td>Section 87A rebate / marginal relief</td><td>' + (o.rebateOrRelief > 0 ? '&minus;' + fmt(o.rebateOrRelief) : fmt(0)) + '</td></tr>';
+  h += '<tr><td>Surcharge' + (o.surNote || '') + '</td><td>' + fmt(o.surcharge) + '</td></tr>';
+  h += '<tr><td>Health &amp; Education Cess (4%)</td><td>' + fmt(o.cess) + '</td></tr>';
+  h += '<tr class="total"><td>Total tax</td><td class="' + (o.tax === 0 ? 'zero' : '') + '">' + fmt(o.tax) + '</td></tr>';
+  h += '<tr><td>Effective tax rate</td><td>' + (o.gross > 0 ? (100*o.tax/o.gross).toFixed(2) : '0.00') + '%</td></tr>';
+  return h;
+}
+
+function calc(){
+  const age = document.getElementById('age').value;
+  const blocked = document.getElementById('blocked');
+  const res = document.getElementById('results');
+  if (age !== 'below60'){
+    res.classList.add('hidden');
+    blocked.classList.remove('hidden');
+    blocked.textContent = 'Not supported in this sample: old-regime slabs differ for individuals aged 60 and above. This calculator supports resident individuals below 60 only, so no estimate is shown rather than a wrong one.';
+    return;
+  }
+  blocked.classList.add('hidden');
+  const salary = num('salary'), other = num('other');
+  const d80c = Math.min(num('d80c'), 150000);
+  const ded = d80c + num('d80d') + num('dother');
+  const gross = salary + other;
+
+  const stdNew = Math.min(salary, 75000), stdOld = Math.min(salary, 50000);
+  const tiNew = Math.max(0, gross - stdNew);
+  const tiOld = Math.max(0, gross - stdOld - ded);
+
+  const rNew = totalTax(tiNew, 'new');
+  const rOld = totalTax(tiOld, 'old');
+
+  const oNew = {taxable: tiNew, slab: rNew.slab, rebateOrRelief: rNew.slab - (rNew.tax - rNew.surcharge - rNew.cess), surcharge: rNew.surcharge, cess: rNew.cess, tax: rNew.tax, gross};
+  const oOld = {taxable: tiOld, slab: rOld.slab, rebateOrRelief: rOld.slab - (rOld.tax - rOld.surcharge - rOld.cess), surcharge: rOld.surcharge, cess: rOld.cess, tax: rOld.tax, gross};
+  if (oNew.surcharge > 0) oNew.surNote = ' (after marginal relief)';
+  if (oOld.surcharge > 0) oOld.surNote = ' (after marginal relief)';
+
+  document.getElementById('tblNew').innerHTML = rows(oNew);
+  document.getElementById('tblOld').innerHTML = rows(oOld);
+
+  const tagNew = document.getElementById('tagNew'), tagOld = document.getElementById('tagOld');
+  const cardNew = document.getElementById('cardNew'), cardOld = document.getElementById('cardOld');
+  tagNew.classList.add('hidden'); tagOld.classList.add('hidden');
+  cardNew.classList.remove('best'); cardOld.classList.remove('best');
+  const verdict = document.getElementById('verdict');
+  if (rNew.tax < rOld.tax){
+    tagNew.classList.remove('hidden'); cardNew.classList.add('best');
+    verdict.textContent = 'New regime saves you ' + fmt(rOld.tax - rNew.tax) + ' for FY 2026-27.';
+  } else if (rOld.tax < rNew.tax){
+    tagOld.classList.remove('hidden'); cardOld.classList.add('best');
+    verdict.textContent = 'Old regime saves you ' + fmt(rNew.tax - rOld.tax) + ' for FY 2026-27.';
+  } else {
+    verdict.textContent = 'Both regimes give the same tax: ' + fmt(rNew.tax) + '.';
+  }
+  res.classList.remove('hidden');
+  res.scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.getElementById('go').addEventListener('click', calc);
+['salary','other','d80c','d80d','dother','age'].forEach(id => document.getElementById(id).addEventListener('input', calc));
+</script>
+</body>
+</html>
